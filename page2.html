@@ -1,0 +1,116 @@
+
+</button>
+</div>
+<br>
+<div id='temp'></div>
+<br>
+<button id="speedButton" onclick="setSpeedMedium()">Set Medium Speed</button>
+<script>
+var state = document.getElementById("state");
+var temp = document.getElementById("temp");
+var speed = document.getElementById('speedButton');
+
+fetch("http://192.168.1.4:5000/getspeed")
+.then((d)=>d.json())
+.then((data)=>
+{
+var t = data.substring(7,data.length-1)
+speed.innerHTML="Set "+data.substring(7,data.length-1)+" Speed";
+if(t=="Medium"){
+ speed.onclick=setSpeedMedium
+}
+else
+speed.onclick=setSpeedFull
+})
+
+setInterval(function(){
+
+
+fetch("http://192.168.1.4:5000/getspeed")
+.then((d)=>d.json())
+.then((data)=>
+{
+var t = data.substring(7,data.length-1)
+speed.innerHTML="Set "+data.substring(7,data.length-1)+" Speed";
+if(t=="Medium"){
+ speed.onclick=setSpeedMedium
+}
+else
+speed.onclick=setSpeedFull
+})
+},2000);
+
+fetch("http://192.168.1.4:5000/temp")
+.then((d)=>d.text())
+.then((data)=>
+{
+temp.innerHTML=data;
+}
+)
+
+if(state.innerHTML.substring(8).trim()=="off")
+ state.innerHTML = "TURN FAN ON"
+else
+ state.innerHTML = "TURN FAN OFF";
+
+function toggle(){
+
+var t = state.innerHTML.substring(9).trim()
+
+fetch("http://192.168.1.4:5000/set.html?set="+t);
+
+if(state.innerHTML=="TURN FAN OFF")
+{
+state.innerHTML="TURN FAN ON";
+}
+else
+{
+state.innerHTML="TURN FAN OFF";
+}
+}
+setInterval(function(){
+fetch("http://192.168.1.4:5000/state")
+.then((d)=>d.json())
+.then((data)=>
+{
+var t = data.substring(8,data.length-1)
+t = t.trim()
+
+
+if(t=="on"){
+state.innerHTML="TURN FAN OFF";
+}
+else{
+state.innerHTML="TURN FAN ON";
+}
+console.log(t)
+}
+)
+}
+,2000)
+
+setInterval(function(){
+fetch("http://192.168.1.4:5000/temp")
+.then((d)=>d.text())
+.then((data)=>
+{
+temp.innerHTML=data;
+}
+)
+},5000)
+
+
+function setSpeedMedium(){
+fetch("http://192.168.1.4:5000/setSpeedMedium")
+speedButton.innerHTML = "Set Full Speed"
+speedButton.onclick = setSpeedFull
+}
+
+function setSpeedFull(){
+fetch("http://192.168.1.4:5000/setSpeedFull")
+speedButton.innerHTML = "Set Medium Speed"
+speedButton.onclick = setSpeedMedium
+}
+</script>
+</body>
+</html>
